@@ -121,6 +121,66 @@ The worker edits files but never commits, pushes or switches branches. Claude Co
 | `--max-turns <n>` | `80` | Turn cap per run |
 | `--check` | | Tiny test call |
 
+### Example commands
+
+These are for Command Prompt. Run them from inside your project folder, or add `--cwd`.
+
+Make a change:
+
+```cmd
+cd C:\Projects\my-app
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --task "Add email and password validation to src\components\Signup.jsx. Email must be a valid format and the password at least 8 characters. Show an error under each field. Add tests and run the existing test suite."
+```
+
+Run a longer brief from a file, with a bigger budget:
+
+```cmd
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --task-file "%TEMP%\brief.txt" --budget 10
+```
+
+Use Opus for a hard task:
+
+```cmd
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --task-file "%TEMP%\brief.txt" --model opus --budget 10
+```
+
+Ask a question without changing anything:
+
+```cmd
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --read-only --task "Where is the API base URL configured, and which files call the API? Give file and line references."
+```
+
+Work on a project from any folder:
+
+```cmd
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --cwd "C:\Projects\my-app" --task "Fix all ESLint errors in the src folder without changing behaviour, then run the linter to confirm."
+```
+
+Test that your key and credit work:
+
+```cmd
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --check
+```
+
+Example output from a successful run:
+
+```text
+DELEGATE_OK (~$0.42 API credit, 14 turns, 96s, model sonnet)
+
+STATUS: done
+CHANGED:
+- src/components/Signup.jsx (email and password validation, inline errors)
+- src/components/Signup.test.jsx (new tests for validation)
+CHECKS: npm test - 24 passed
+NOTES: Password minimum set to 8 characters as briefed.
+
+Uncommitted changes in the working tree now:
+ M src/components/Signup.jsx
+?? src/components/Signup.test.jsx
+
+Log: C:\Users\you\.claude\delegate\logs\2026-10-14T09-12-03-511Z-add-email-and-password-validation.jsonl
+```
+
 ### Output status
 
 The first line of output is always one of these:
