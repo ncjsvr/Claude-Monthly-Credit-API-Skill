@@ -134,6 +134,66 @@ The first line of output is always one of these:
 
 Full logs for every run are in `%USERPROFILE%\.claude\delegate\logs`.
 
+## Using it from Command Prompt when you've hit your limit
+
+If you've hit your Claude Code session or weekly limit and can't use Claude at all, run the delegate directly from Command Prompt. It bills the API credit, so your plan limits don't affect it.
+
+### 1. Write the brief with ChatGPT
+
+The worker has none of your Claude Code context and can't ask questions, so the brief has to stand on its own. Since Claude isn't available, use ChatGPT to write it. Paste this into ChatGPT and fill in the brackets:
+
+```text
+Write a task brief for an autonomous coding agent that will work unattended in my project. It has no context beyond the brief and the code, and it can't ask me questions.
+
+Project: [what the project is, language and framework]
+Task: [what I want done]
+Relevant files: [paths, if known]
+Done means: [e.g. tests pass, the feature works when X]
+Don't touch: [files or areas to leave alone]
+
+Write the brief as plain text with these sections: Goal, Context, Files, Requirements, Acceptance criteria, Out of scope. Be specific and concise. Output only the brief.
+```
+
+### 2. Run it
+
+For a longer brief, such as one from ChatGPT, open Notepad, paste the brief in, save and close, then run the delegate:
+
+```cmd
+cd C:\path\to\your\project
+notepad %TEMP%\brief.txt
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --task-file "%TEMP%\brief.txt"
+```
+
+For a short one-line task:
+
+```cmd
+cd C:\path\to\your\project
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --task "Write unit tests for src\utils\dates.js and make sure they pass"
+```
+
+Avoid double quotes inside the task text, because cmd treats them as the end of the argument.
+
+To ask a question about the code without changing anything:
+
+```cmd
+node "%USERPROFILE%\.claude\delegate\delegate.mjs" --read-only --task "How does authentication work in this project? List the files involved."
+```
+
+For bigger jobs, add `--budget 10` (the default cap is $3 per run). To run from outside the project folder, add `--cwd "C:\path\to\project"`.
+
+### 3. Review the result
+
+The output starts with a status line and the cost, followed by the worker's report: what changed, what checks it ran, and any notes. The worker never commits, so check its changes with:
+
+```cmd
+git status
+git diff
+```
+
+Commit your own work before delegating. Then the diff shows only the worker's changes, and `git restore .` cleanly undoes them if you don't like the result.
+
+If the output says `DELEGATE_UNAVAILABLE`, the credit has run out for this billing cycle.
+
 ## Updating
 
 ```powershell
