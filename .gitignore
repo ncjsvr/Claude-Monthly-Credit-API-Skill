@@ -1,0 +1,5 @@
+# Never commit the API key, installed packages or run logs
+api-key.txt
+node_modules/
+logs/
+*.jsonl
